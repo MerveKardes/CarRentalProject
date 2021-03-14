@@ -10,9 +10,9 @@ namespace ConsoleUI
     {
         static void Main(string[] args)
         {
-            RentalManager rentalManager = new RentalManager(new EfRentalDal());
+            //RentalManager rentalManager = new RentalManager(new EfRentalDal());
            
-            rentalManager.Add(2);
+            //rentalManager.Add(2);
            
              //CarTest();
 

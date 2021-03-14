@@ -2,6 +2,7 @@
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
+using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concrete;
@@ -19,35 +20,16 @@ namespace Business.Concrete
             _rentalDal = rentalDal;
         }
 
-        //[ValidationAspect(typeof(RentalValidator))]
+       // [ValidationAspect(typeof(RentalValidator))]
         public IResult Add(Rental rental)
         {
-            if (rental.ReturnDate == null)
+           IResult result= BusinessRules.Run(CheckIfCarRental(rental));
+            if (result != null)
             {
-                return new ErrorResult(Messages.CarRentalInvalid);
+                return result;
             }
             _rentalDal.Add(rental);
-            return new SuccessResult();
-
-            //var result = _rentalDal.Get(p => p.CarId == rental.CarId && rental.ReturnDate == null);
-            //if (result!=null)
-            //{
-            //    return new ErrorResult(Messages.CarRentalInvalid);
-
-            //}
-            //_rentalDal.Add(rental);
-            //return new SuccessResult(Messages.RentalAdded);
-
-            //var result = _rentalDal.Get(c => c.CarId == rental.CarId);
-
-            //if (result.ReturnDate != null)
-            //{
-            //    _rentalDal.Add(rental);
-            //    return new SuccessResult(Messages.RentalAdded);
-            //}
-
-            //return new ErrorResult(Messages.CarRentalInvalid);
-
+            return new SuccessResult(Messages.RentalAdded);
         }
 
         public IResult Delete(Rental rental)
@@ -78,6 +60,18 @@ namespace Business.Concrete
         {
             _rentalDal.Update(rental);
             return new SuccessResult(Messages.Updated);
+        }
+
+        private IResult CheckIfCarRental(Rental rental)
+        {
+            var result = _rentalDal.Get(p => p.CarId == rental.CarId && rental.ReturnDate == null);
+            if (result != null)
+            {
+                return new ErrorResult(Messages.CarRentalInvalid);
+
+            }
+            _rentalDal.Add(rental);
+            return new SuccessResult(Messages.RentalAdded);
         }
     }
 }
